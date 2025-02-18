@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIRAL РУЛЕТКА</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .container {
+            padding: 20px;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+        .green { background-color: green; color: white; }
+        .red { background-color: red; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>VIRAL РУЛЕТКА</h1>
+        <p>Нажмите кнопку, чтобы сыграть!</p>
+        <button class="button green" onclick="spin()">🎰 Крутить рулетку</button>
+        <p id="result"></p>
+        <button class="button red" onclick="Telegram.WebApp.close()">❌ Закрыть</button>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand(); // Растягиваем на весь экран
+
+        function spin() {
+            let result = Math.random() < 0.5 ? "Вы выиграли! 🎉" : "Вы проиграли! 😢";
+            document.getElementById("result").innerText = result;
+        }
+    </script>
+</body>
+</html>
