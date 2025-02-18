@@ -25,12 +25,19 @@
         }
         .green { background-color: green; color: white; }
         .red { background-color: red; color: white; }
+        .spinner {
+            font-size: 30px;
+            margin: 20px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>VIRAL РУЛЕТКА</h1>
         <p>Нажмите кнопку, чтобы сыграть!</p>
+        <div class="spinner" id="spinner">🎰</div>
         <button class="button green" onclick="spin()">🎰 Крутить рулетку</button>
         <p id="result"></p>
         <button class="button red" onclick="Telegram.WebApp.close()">❌ Закрыть</button>
@@ -38,11 +45,31 @@
 
     <script>
         let tg = window.Telegram.WebApp;
-        tg.expand(); // Растягиваем на весь экран
+        tg.expand(); // Растягиваем WebApp на весь экран
 
         function spin() {
-            let result = Math.random() < 0.5 ? "Вы выиграли! 🎉" : "Вы проиграли! 😢";
-            document.getElementById("result").innerText = result;
+            let spinner = document.getElementById("spinner");
+            let resultText = document.getElementById("result");
+
+            spinner.style.opacity = "1"; // Показать анимацию
+            resultText.innerText = "Крутим рулетку... ⏳";
+            
+            setTimeout(() => {
+                let win = Math.random() < 0.5;
+                let result = win ? "🎉 Вы выиграли 20 монет!" : "😢 Вы проиграли!";
+                
+                resultText.innerText = result;
+                spinner.style.opacity = "0"; // Убрать анимацию
+
+                // Отправляем результат обратно в бота
+                tg.sendData(JSON.stringify({ win: win, amount: win ? 20 : 0 }));
+
+                // Авто-закрытие через 3 секунды (по желанию)
+                setTimeout(() => {
+                    tg.close();
+                }, 3000);
+
+            }, 2000); // Даем время на "вращение"
         }
     </script>
 </body>
