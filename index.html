@@ -3,162 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Горизонтальная рулетка</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Колесо Фортуны</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #121212;
-            color: white;
-            overflow: hidden;
-        }
-        .container {
-            margin-top: 50px;
-        }
-        .roulette-container {
-            position: relative;
-            width: 420px;
-            height: 120px;
-            margin: auto;
-            overflow: hidden;
-            border: 4px solid #fff;
-            background-color: #222;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-        }
-        .roulette {
             display: flex;
-            position: absolute;
-            left: 0;
-            transition: transform 3.5s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        .item {
-            width: 120px;
-            height: 120px;
-            display: flex;
-            align-items: center;
+            flex-direction: column;
             justify-content: center;
-            font-size: 18px;
-            font-weight: bold;
+            align-items: center;
+            height: 100vh;
+            background-color: #282c34;
+            font-family: Arial, sans-serif;
+            margin: 0;
             color: white;
-            border-right: 2px solid black;
+        }
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
             text-transform: uppercase;
         }
-        .prize-1 { background: linear-gradient(45deg, #ff6666, #ff3333); }
-        .prize-2 { background: linear-gradient(45deg, #ffcc66, #ff9933); }
-        .prize-3 { background: linear-gradient(45deg, #66ff66, #33cc33); }
-        .prize-4 { background: linear-gradient(45deg, #6666ff, #3333cc); }
-        .prize-5 { background: linear-gradient(45deg, #ff66ff, #cc33cc); }
-        .prize-6 { background: linear-gradient(45deg, #66ffff, #33cccc); }
-        .empty { background: linear-gradient(45deg, #555, #333); color: #ff4444; }
-        .spin-btn {
-            margin-top: 20px;
-            padding: 12px 25px;
-            font-size: 18px;
+        .wheel-container {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 5px solid white;
+            transform-origin: center;
+            background: conic-gradient(
+                red 0deg 51.43deg,
+                orange 51.43deg 102.86deg,
+                yellow 102.86deg 154.29deg,
+                green 154.29deg 205.71deg,
+                blue 205.71deg 257.14deg,
+                indigo 257.14deg 308.57deg,
+                gray 308.57deg 360deg
+            );
+            position: absolute;
+            z-index: 2;
+        }
+        .spin-button {
+            position: absolute;
+            background-color: white;
+            color: black;
             border: none;
-            border-radius: 5px;
-            background: linear-gradient(45deg, #0f0, #080);
-            color: white;
+            width: 70px;
+            height: 70px;
+            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 3;
+            transition: transform 0.2s;
         }
-        .spin-btn:disabled {
-            background: gray;
-            cursor: not-allowed;
+        .spin-button:active {
+            transform: scale(1.1);
         }
-        .close-btn {
+        .arrow {
+            position: absolute;
+            top: 50%;
+            right: -30px;
+            transform: translateY(-50%) rotate(90deg);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 40px solid red;
+            z-index: 1;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .close-button {
             margin-top: 20px;
             padding: 10px 20px;
-            font-size: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            background-color: red;
+            color: white;
             border: none;
             border-radius: 5px;
-            background: linear-gradient(45deg, #f00, #a00);
-            color: white;
             cursor: pointer;
-        }
-        .indicator {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 5px;
-            height: 100%;
-            background-color: red;
-            box-shadow: 0 0 10px red;
-            z-index: 10;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Горизонтальная рулетка 🎰</h1>
-        <div class="roulette-container">
-            <div class="indicator"></div>
-            <div class="roulette" id="roulette">
-                <div class="item prize-1">Приз 1</div>
-                <div class="item prize-2">Приз 2</div>
-                <div class="item prize-3">Приз 3</div>
-                <div class="item empty">ПУСТО</div>
-                <div class="item prize-4">Приз 4</div>
-                <div class="item prize-5">Приз 5</div>
-                <div class="item prize-6">Приз 6</div>
-                <!-- Дублируем элементы для бесконечной ленты -->
-                <div class="item prize-1">Приз 1</div>
-                <div class="item prize-2">Приз 2</div>
-                <div class="item prize-3">Приз 3</div>
-                <div class="item empty">ПУСТО</div>
-                <div class="item prize-4">Приз 4</div>
-                <div class="item prize-5">Приз 5</div>
-                <div class="item prize-6">Приз 6</div>
-            </div>
-        </div>
-        <button id="spin-btn" class="spin-btn" onclick="spinRoulette()">Крутить 🎰</button>
-        <p id="result"></p>
-        <button class="close-btn" onclick="Telegram.WebApp.close()">❌ Закрыть</button>
+    <div class="title">VIRAL РУЛЕТКА</div>
+    <div class="wheel-container">
+        <div class="arrow"></div>
+        <div class="wheel" id="wheel"></div>
+        <button class="spin-button" id="spin">SPIN</button>
     </div>
-
+    <div class="result" id="result">Вращайте колесо!</div>
+    <button class="close-button" onclick="window.close()">Закрыть</button>
     <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-
-        const roulette = document.getElementById("roulette");
-        const items = document.querySelectorAll(".item");
-        const spinButton = document.getElementById("spin-btn");
-        const resultText = document.getElementById("result");
-        let isSpinning = false;
-
-        function spinRoulette() {
-            if (isSpinning) return;
-            isSpinning = true;
-            spinButton.disabled = true;
-
-            let randomIndex = Math.floor(Math.random() * 7); // 7 элементов (1 пустая + 6 призов)
-            let itemWidth = items[0].offsetWidth;
-            let offset = -randomIndex * itemWidth;
-
-            // Дополнительные прокруты для плавности
-            let extraSpins = -(items.length * itemWidth * 2);
-
-            roulette.style.transition = "transform 3.5s cubic-bezier(0.25, 1, 0.5, 1)";
-            roulette.style.transform = `translateX(${extraSpins + offset}px)`;
-
-            setTimeout(() => {
-                let selectedItem = items[randomIndex].innerText;
-                resultText.innerText = `Результат: ${selectedItem}`;
-
-                // Отправляем в Telegram WebApp
-                tg.sendData(JSON.stringify({ result: selectedItem }));
-
-                isSpinning = false;
-                spinButton.disabled = false;
-
-                // Возвращаем на начальную позицию для бесконечной ленты
+        const segments = ["ПРИЗ!", "ПРИЗ!", "ПРИЗ!", "ПРИЗ!", "ПРИЗ!", "ПРИЗ!", "ПУСТО"];
+        let canSpin = true;
+        document.getElementById("spin").addEventListener("click", () => {
+            if (!canSpin) return;
+            canSpin = false;
+            const wheel = document.getElementById("wheel");
+            const resultText = document.getElementById("result");
+            let randomRotation = 1800 + Math.floor(Math.random() * 360);
+            gsap.to(wheel, { rotation: randomRotation, duration: 3, ease: "power3.out", onComplete: () => {
+                let finalRotation = randomRotation % 360;
+                let segmentIndex = Math.floor((360 - finalRotation) / (360 / segments.length)) % segments.length;
+                resultText.textContent = "Выигрыш: " + segments[segmentIndex];
                 setTimeout(() => {
-                    roulette.style.transition = "none";
-                    roulette.style.transform = "translateX(0px)";
-                }, 500);
-            }, 3500);
-        }
+                    canSpin = true;
+                }, 30000);
+            }});
+        });
     </script>
 </body>
 </html>
