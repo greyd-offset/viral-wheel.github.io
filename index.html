@@ -121,7 +121,12 @@
             gsap.to(wheel, { rotation: randomRotation, duration: 3, ease: "power3.out", onComplete: () => {
                 let finalRotation = randomRotation % 360;
                 let segmentIndex = Math.floor((360 - finalRotation) / (360 / segments.length)) % segments.length;
-                resultText.textContent = "Выигрыш: " + segments[segmentIndex];
+                let result = segments[segmentIndex];
+                resultText.textContent = "Выигрыш: " + result;
+                
+                // Отправляем результат в Aiogram через WebAppData
+                window.Telegram.WebApp.sendData(JSON.stringify({ result: result }));
+                
                 setTimeout(() => {
                     canSpin = true;
                 }, 30000);
